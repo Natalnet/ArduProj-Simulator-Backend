@@ -1,0 +1,40 @@
+
+BIN=./bin
+
+#arquivos do arduino wrapper
+ARDUINO_FOLDER=./arduino_wrapper
+ARDUINO_SRC=$(wildcard $(ARDUINO_FOLDER)/src/*.cpp)
+ARDUINO_BIN=$(ARDUINO_SRC:.cpp=.wat)
+ARDUINO_INCLUDE=$(ARDUINO_FOLDER)/include
+ARDUINO_HEADERS=$(wildcard $(ARDUINO_INCLUDE)/*.h)
+
+#arquivos vindos do frontend
+TARGET_FOLDER=./src
+TARGET_SRC=$(wildcard $(TARGET_FOLDER)/*.cpp)
+TARGET_BIN=$(TARGET_SRC:.cpp=.wat)
+TARGET_INCLUDE=$(TARGET_FOLDER)
+
+#arquivos responsáveis pela integração com javascript
+JS_INTEGRATION_FOLDER=./js_integration
+JS_INTEGRATION_SRC=$(wildcard $(JS_INTEGRATION_FOLDER)/src/*.cpp)
+JS_INTEGRATION_INCLUDE=$(JS_INTEGRATION_FOLDER)
+JS_INTEGRATION_SYMBOLS=$(JS_INTEGRATION_FOLDER)/js_symbols #define os simbolos que serão implementados em js
+
+WASI_SDK=/opt/wasi-sdk-14.0#webassembly wasi sdk, contem uma implementação da clib e clibcpp
+CXX=${WASI_SDK}/bin/clang++
+WASI_SYSROOT=$(WASI_SDK)/share/wasi-sysroot/
+
+all: exec
+	$(CXX) --target=wasm32-wasi --sysroot=$(WASI_SYSROOT) -Wl,--export-all -Wl,--import-memory -Wl,--allow-undefined-file=$(JS_INTEGRATION_SYMBOLS) $(ARDUINO_BIN) $(TARGET_BIN) -o $(BIN)/exec.wat
+
+clean: 
+	rm -rf $(ARDUINO_BIN) $(TARGET_BIN) $(BIN)/exec.wat
+
+exec: arduino src
+
+arduino: $(ARDUINO_BIN) $(ARDUINO_HEADERS)
+
+src: $(TARGET_BIN)
+
+%.wat: %.cpp
+	$(CXX) --target=wasm32-wasi --sysroot=$(WASI_SYSROOT) -c -I$(TARGET_INCLUDE) -I$(ARDUINO_INCLUDE) -I$(JS_INTEGRATION_INCLUDE) $< -o $@
