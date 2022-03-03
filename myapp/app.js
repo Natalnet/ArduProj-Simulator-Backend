@@ -1,6 +1,7 @@
 const util = require('util')
 const express = require('express')
 const cors = require("cors");
+const { execSync } = require("child_process");
 
 const webAsmCompile = require('./webasmCompiler.js')
 
@@ -20,13 +21,19 @@ app.use(express.static('./public'));
 app.get('/');
 app.post('/compile-wasm', (req, res) => {
     console.log(`Received code ${util.inspect(req.body)}`)
-
     compiledCode = webAsmCompile.compileCppSource(req.body.code);
-
-    
     res.send({res : compiledCode})
 })
+
+try {
+  execSync(`em++ --version`);
+}
+catch(e){
+  console.log(`Error calling em++, the backend needs this command to execute properly, exiting`);
+  process.exit(-1)
+}
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
