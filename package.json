@@ -1,5 +1,8 @@
 {
   "name": "ArduProj-Simulator-Backend",
+  "scripts": {
+    "start": "node myapp/app.js"
+  },
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
