@@ -59,9 +59,12 @@ function compileCppSource(source){
     });
     execSync(`cp ${makefileLocation}/bin/exec.wasm public/`);
     execSync(`cp ${makefileLocation}/bin/exec.js public/`);
+
+    let binaryBuffer = fs.readFileSync(`${makefileLocation}/bin/exec.wasm`)
+
     
     //maybe use some user dir to handle this, even if its temp
-    return {jsfile : 'exec.js', wasmfile: 'exec.wasm'};
+    return {binary: binaryBuffer};
 
     //versao antiga
     //const data = fs.readFileSync(`${makefileLocation}/bin/exec.wasm`);

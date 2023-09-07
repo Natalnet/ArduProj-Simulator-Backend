@@ -1,2 +1,4 @@
 node_modules
-public/exec
+public/exec*
+webasm-config/bin/exec*
+*.o

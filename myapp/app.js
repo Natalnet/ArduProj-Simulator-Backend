@@ -22,6 +22,8 @@ app.get('/');
 app.post('/compile-wasm', (req, res) => {
     console.log(`Received code ${util.inspect(req.body)}`)
     compiledCode = webAsmCompile.compileCppSource(req.body.code);
+    res.setHeader('Content-Type', 'application/octet-stream');
+
     res.send({res : compiledCode})
 })
 

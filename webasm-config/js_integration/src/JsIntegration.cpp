@@ -20,8 +20,11 @@ int _getArduinoState (int index){
 }
 */
 #include <emscripten.h>
+#include <iostream>
 
 using namespace emscripten;
+
+static bool stop = false;
 
 EM_JS(void, _notifyUpdate, (), {
   console.log('Notify update called');
@@ -29,21 +32,41 @@ EM_JS(void, _notifyUpdate, (), {
   self.notifyUpdate();
 });
 
+EM_JS(void, _notifyFinished, (), {
+  console.log('Notify finished called');
+  console.log('Calling self.notifyFinished ' + self.notifyFinished); //defined in worker or in global self
+  self.notifyFinished();
+});
+
 std::string getArduinoState(int index){
     return _getArduinoState(index);
 }
 
-void js_sleepAsync(int ms){
-    emscripten_sleep(ms);
+void stopLoop(){
+    stop = true;
 }
 
-void js_notifiUpdate(){
+bool shouldStop(){
+    return stop;
+}
+
+void js_sleepAsync(int ms){
+    emscripten_sleep(ms);
+    std::cout << "sleep break" << std::endl;
+}
+
+void js_notifyUpdate(){
     _notifyUpdate();
+}
+
+void js_notifyFinished(){
+    _notifyFinished();
 }
 
 
 EMSCRIPTEN_BINDINGS(module) {
     function("getArduinoState", &getArduinoState);
+    function("stopLoop", &stopLoop);
 }
 
 

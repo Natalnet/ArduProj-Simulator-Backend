@@ -24,7 +24,7 @@ CXX=emcc
 
 #$(CXX) $(ARDUINO_BIN) $(TARGET_BIN) $(JS_INTEGRATION_BIN) -lembind -s ASYNCIFY --extern-pre-js $(JS_INTEGRATION_FOLDER)/pre.js --extern-post-js $(JS_INTEGRATION_FOLDER)/pos.js -o $(BIN)/exec.js 
 all: exec
-	$(CXX) $(ARDUINO_BIN) $(TARGET_BIN) $(JS_INTEGRATION_BIN) -lembind -s ASYNCIFY --extern-pre-js $(JS_INTEGRATION_FOLDER)/pre.js -o $(BIN)/exec.js 
+	$(CXX) $(ARDUINO_BIN) $(TARGET_BIN) $(JS_INTEGRATION_BIN) -sEXPORT_ES6=1 -sMODULARIZE=1 -sUSE_ES6_IMPORT_META=0 -sEXPORT_NAME='createArduinoEnv' -sENVIRONMENT=web,worker -lembind -s ASYNCIFY -o $(BIN)/exec.js 
 
 clean: 
 	rm -rf $(ARDUINO_BIN) $(TARGET_BIN) $(JS_INTEGRATION_BIN) $(BIN)/*

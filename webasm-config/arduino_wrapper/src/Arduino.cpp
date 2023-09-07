@@ -18,7 +18,7 @@ void pinMode(int pin, int mode){
 void digitalWrite(int pin, int val){
     if(pin_mode[pin] == OUTPUT && val != pin_values[pin]){
         pin_values[pin] = val;
-        js_notifiUpdate();
+        js_notifyUpdate();
     }
 }
 
