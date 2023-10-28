@@ -10,8 +10,11 @@ int main(){
 
     setup();
 
-    while(!shouldStop())
+    while(!shouldStop()){
         loop();
+        js_notifyUpdate();
+        std::cout<<js_getAllPinValues(0)<<std::endl;
+    }
 
     js_notifyFinished();
 

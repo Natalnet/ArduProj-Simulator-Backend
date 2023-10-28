@@ -11,20 +11,36 @@ static std::vector<uint8_t> pin_values = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 /*state keeps the arduino state in string format so it is easier to use on js side*/
 static std::string state;
 
-void pinMode(int pin, int mode){
+void pinMode(int pin, PinMode mode){
     pin_mode[pin] = mode;
 }
 
 void digitalWrite(int pin, int val){
-    if(pin_mode[pin] == OUTPUT && val != pin_values[pin]){
+    if(pin_mode[pin] == PinMode::OUTPUT){
         pin_values[pin] = val;
-        js_notifyUpdate();
     }
 }
 
+DigitalState fromInt(int value){
+    if (value == 1)
+        return DigitalState::HIGH;
+    return DigitalState::LOW;
+}
+
+DigitalState digitalRead(int pin){
+    if(pin_mode[pin] == PinMode::INPUT){
+        pin_values[pin] = js_digitalRead(0, pin);
+        return fromInt(pin_values[pin]);
+    }
+    //poderia disparar uma exception aqui
+    return fromInt(pin_values[pin]);
+}
+
 void delay(int ms){
+    js_notifyUpdate();
     js_sleepAsync(ms);
 }
+
 
 std::string _getArduinoState(int index){
     state = "[";
@@ -41,8 +57,12 @@ std::string _getArduinoState(int index){
     return state;
 }
 
+
+
 /*recebe um vetor de valores com os estados no mesmo formato do getState*/
-void updateAruinoState(std::string state){
+void _updateArduinoState(int index, std::string pinValues){
+
+    std::cout<<"values gotten from js "<<index<<" "<<pinValues<<std::endl;
 
 }
 
